@@ -60,6 +60,32 @@ class PathfindingAlgorithms:
                     queue.append((neighbor_pos, path + [direction]))
         return []
 
+    def dijkstra(self, start, target, dynamic_obstacles=None):
+        """
+        Dijkstra's Algorithm: Find shortest path from start to target
+        Returns list of directions to reach target
+        """
+        heap = [(0, start, [])]  # (distance, position, path)
+        distances = {start: 0}
+        processed_nodes = set()
+
+        while heap:
+            current_distance, current_pos, path = heapq.heappop(heap)
+
+            if current_pos in processed_nodes:
+                continue
+            processed_nodes.add(current_pos)
+
+            if current_pos == target:
+                return path
+
+            for neighbor_pos, direction in self.get_neighbors(current_pos, dynamic_obstacles):
+                new_distance = current_distance + 1
+                if neighbor_pos not in distances or new_distance < distances[neighbor_pos]:
+                    distances[neighbor_pos] = new_distance
+                    heapq.heappush(heap, (new_distance, neighbor_pos, path + [direction]))
+        return []
+
     def find_closest_target(self, start, targets, algorithm='bfs', dynamic_obstacles=None):
         """
         Find the closest target from a set of targets using specified algorithm
