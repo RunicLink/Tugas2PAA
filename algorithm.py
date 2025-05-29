@@ -86,6 +86,34 @@ class PathfindingAlgorithms:
                     heapq.heappush(heap, (new_distance, neighbor_pos, path + [direction]))
         return []
 
+    def a_star(self, start, target, dynamic_obstacles=None):
+        """
+        A* Search: Find optimal path from start to target using heuristic
+        Returns list of directions to reach target
+        """
+        heap = [(0, 0, start, [])]  # (f_score, g_score, position, path)
+        g_scores = {start: 0}
+        closed_set = set()
+
+        while heap:
+            f_score_val, g_score, current_pos, path = heapq.heappop(heap)
+
+            if current_pos in closed_set:
+                continue
+            closed_set.add(current_pos)
+
+            if current_pos == target:
+                return path
+
+            for neighbor_pos, direction in self.get_neighbors(current_pos, dynamic_obstacles):
+                tentative_g_score = g_score + 1
+                if tentative_g_score < g_scores.get(neighbor_pos, float('inf')):
+                    g_scores[neighbor_pos] = tentative_g_score
+                    h_score = self.manhattan_distance(neighbor_pos, target)
+                    new_f_score = tentative_g_score + h_score
+                    heapq.heappush(heap, (new_f_score, tentative_g_score, neighbor_pos, path + [direction]))
+        return []
+
     def find_closest_target(self, start, targets, algorithm='bfs', dynamic_obstacles=None):
         """
         Find the closest target from a set of targets using specified algorithm
